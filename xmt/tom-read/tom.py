@@ -1,4 +1,6 @@
 import cstruct
+from PIL import Image
+import numpy as np
 
 class TOMHEAD(cstruct.CStruct):
 	__byte_order__ = cstruct.LITTLE_ENDIAN
@@ -59,11 +61,26 @@ class TOMHEAD(cstruct.CStruct):
 
 tomfile = "as_tooth1_scan3.tom"
 with open(tomfile, "rb") as f:
-	tom = TOMHEAD()
-	data = f.read(len(tom))
-	tom.unpack(data)
-	tom.print_info()
+    tom = TOMHEAD();
+    header = f.read(len(tom));
+    tom.unpack(header)
+    tom.print_info();
+    total = tom.xsize*tom.ysize*tom.zsize;
+    print ("Tota data size (bytes): %s" % total);
+    f.seek(len(tom));
+    volume = np.fromfile(f, dtype='uint8',count=tom.xsize*tom.ysize)
+    #f.read(tom.xsize*tom.ysize*tom.zsize);
+    wibble = volume.shape;
+    volume.reshape(tom.xsize,tom.ysize)
+    wibble2 = volume.shape;
+img = Image.fromarray(volume, 'L')
+img.show()
 
-total = tom.xsize*tom.ysize*tom.zsize
 
-print ("Tota data size (bytes): %s" % total)
+
+
+
+
+
+
+
